@@ -1,0 +1,17 @@
+cuando ponga ${} se sustituye por lo que haga falta
+
+PARA PONEROS EN VUESTRA RAMA
+
+git checkout ${nombre}
+
+SIEMPRE HACER PULL DE MAIN ANTES DE EMPEZAR A TRABAJAR
+
+git pull origin main
+
+CUANDO ACABEIS DE TRABAJAR
+
+git add ${archivos o carpetas con modificaciones}
+git commit -m "${comentario}"
+git push origin ${nombre}
+
+DADME UN TOQUE PARA QUE VEA QUE TODO ESTA BIEN Y HACER UPDATE DE MAIN
