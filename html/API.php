@@ -6,7 +6,7 @@ if ($_SERVER['PHP_SELF'] === '/api.php') {
 
 // Cambiar nombres de la base de datos, pls no dejes todo hardcodeado 🙄
 function dbConnect() {
-    return new PDO('mysql:host=localhost;dbname=your_db;charset=utf8mb4', 'your_user', 'your_pass', [
+    return new PDO('mysql:host=localhost;dbname=flashmarket;charset=utf8mb4', 'root', '', [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
     ]);
 }
