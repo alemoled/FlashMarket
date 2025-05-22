@@ -1,0 +1,53 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f2f2f2;
+  padding: 40px;
+}
+
+h2, h3 {
+  margin-top: 0;
+  color: #333;
+  font-weight: normal;
+}
+
+.carrito, .recomendados {
+  background-color: #fff;
+  padding: 30px;
+  margin-bottom: 40px;
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.05);
+}
+
+.producto-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.producto {
+  text-align: center;
+}
+
+.producto img {
+  width: 100%;
+  max-width: 150px;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.producto .nombre {
+  display: block;
+  margin-top: 10px;
+  font-size: 16px;
+  color: #333;
+}
+
+.producto .precio {
+  display: block;
+  margin-top: 5px;
+  font-weight: bold;
+  color: #666;
+}
