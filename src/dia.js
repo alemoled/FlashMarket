@@ -10,13 +10,6 @@ import mysql from "mysql2/promise";
   await page.goto(
     "https://www.dia.es/charcuteria-y-quesos/c/L101?_gl=1*6b39vi*_up*MQ..*_gs*MQ..&gclid=CjwKCAjw3MXBBhAzEiwA0vLXQSzUErx4RI3NSCdIAl40PjsqXkKY8gZcJfmDuAkpTGl_B-MQpmgVyhoC7UQQAvD_BwE&gclsrc=aw.ds&gbraid=0AAAAADdKPtLkD2ZoTY5VUSQeWSkerCv-x"
   );
-  await page.waitForNavigation({ waitUntil: "networkidle0" });
-  await page.waitForSelector(".basic-section-l1__item-container");
-  await page.waitForFunction(
-    () =>
-      document.querySelectorAll(".basic-section-l1__item-container").length > 0
-  );
-
   const a = await scrapingDia(page);
   console.log(a);
   await browser.close();
