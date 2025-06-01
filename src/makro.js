@@ -7,8 +7,8 @@ import mysql from "mysql2/promise";
 //Iniciamos el navegador bot y configuramos para que el bot no sea automaticamente bloqueado y podamos trabajar sin abrir un navegador
 puppeteer.use(StealthPlugin());
 const browser = await puppeteer.launch({
-  headless: false,
-  slowMo: 200
+  headless: "new",
+
 });
 // const configBBDD = mysql.createPool({
 //   host: "localhost",
@@ -46,7 +46,7 @@ async function getDescription(productURL, browser) {
       timeout: 60000,
     });
     const description = await productPage.evaluate(() => {
-      const productContainer = document.getElementById("details-tabs-pane-1");
+      const productContainer = document.querySelector(".tab-pane");
       return (
         productContainer.querySelector("div div p span")?.textContent.trim() ||
         "sin descripcion"
@@ -171,7 +171,7 @@ async function insertproductsMakro(products, connection) {
     const page = await browser.newPage();
     await page.goto(URLs[i]);
     const productsPage = await scrapingMakro(page, browser);
-    productsDiaArray.push(...productsPage);
+    productsMakroArray.push(...productsPage);
     await page.close();
   }
   // Hasta aqui el scrapping de Dia, toca meterlo en la bbdd
