@@ -73,9 +73,11 @@ async function scrapingDia(page, browser) {
     Array.from(element).map((el) => el.outerHTML)
   );
   //category
-  const resCategory = await page.evaluate(() => {
+  var resCategory = await page.evaluate(() => {
     return document.querySelector(".plp-l1__category-title").textContent;
   });
+  if(resCategory=="Pescados, mariscos y ahumados")resCategory="Pescados y mariscos"
+  if(resCategory=="Carnicería")resCategory="Carne"
   const results = await Promise.all(
     containers.map(async (container) => {
       const $ = cheerio.load(container);
@@ -169,6 +171,7 @@ async function insertproductsDia(products, connection) {
     "https://www.dia.es/leche-huevos-y-mantequilla/c/L108?_gl=1*1pr1d4b*_up*MQ..&gclid=CjwKCAjw3MXBBhAzEiwA0vLXQSzUErx4RI3NSCdIAl40PjsqXkKY8gZcJfmDuAkpTGl_B-MQpmgVyhoC7UQQAvD_BwE&gclsrc=aw.ds&gbraid=0AAAAADdKPtLkD2ZoTY5VUSQeWSkerCv-x",
     "https://www.dia.es/aceites-salsas-y-especias/c/L107?_gl=1*1pr1d4b*_up*MQ..&gclid=CjwKCAjw3MXBBhAzEiwA0vLXQSzUErx4RI3NSCdIAl40PjsqXkKY8gZcJfmDuAkpTGl_B-MQpmgVyhoC7UQQAvD_BwE&gclsrc=aw.ds&gbraid=0AAAAADdKPtLkD2ZoTY5VUSQeWSkerCv-x",
     "https://www.dia.es/limpieza-y-hogar/c/L122?_gl=1*gqiz82*_up*MQ..&gclid=CjwKCAjw3MXBBhAzEiwA0vLXQSzUErx4RI3NSCdIAl40PjsqXkKY8gZcJfmDuAkpTGl_B-MQpmgVyhoC7UQQAvD_BwE&gclsrc=aw.ds&gbraid=0AAAAADdKPtLkD2ZoTY5VUSQeWSkerCv-x",
+    "https://www.dia.es/pescados-mariscos-y-ahumados/c/L103"
   ];
   const productsDiaArray = [];
   for (let i = 0; i < URLs.length; i++) {

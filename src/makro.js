@@ -8,14 +8,13 @@ import mysql from "mysql2/promise";
 puppeteer.use(StealthPlugin());
 const browser = await puppeteer.launch({
   headless: "new",
-
 });
-// const configBBDD = mysql.createPool({
-//   host: "localhost",
-//   user: "root",
-//   password: "",
-//   database: "flashmarket",
-// });
+const configBBDD = mysql.createPool({
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "flashmarket",
+});
 // Funcion general para que el navegador baje hasta el fondo de la pagina y asi cargue los elemento dinamicos
 async function autoScroll(page) {
   await page.evaluate(async () => {
@@ -45,11 +44,15 @@ async function getDescription(productURL, browser) {
       waitUntil: "networkidle2",
       timeout: 60000,
     });
+    await autoScroll(productPage);
     const description = await productPage.evaluate(() => {
-      const productContainer = document.querySelector(".tab-pane");
+      const productContainer = document.querySelector("#details-tabs-pane-1");
+      if (!productContainer) return "Elemento no encontrado";
       return (
-        productContainer.querySelector("div div p span")?.textContent.trim() ||
-        "sin descripcion"
+        productContainer
+          .querySelector("p")
+          ?.innerText.replace(/\n/g, " ")
+          .trim() || "Sin descripción"
       );
     });
     await productPage.close();
@@ -75,12 +78,12 @@ async function scrapingMakro(page, browser) {
   );
   //category
   const resCategory = await page.evaluate(() => {
-    return document
-      .querySelector(
-        ".list-group-item.list-group-item-header.list-group-item-back h1 span"
-      )
-      .textContent.trim()
-      .replace(/\u00A0/g, " ");
+    const categoryElement = document.querySelector(
+      ".list-group-item.list-group-item-header.list-group-item-back h1 span"
+    );
+    return categoryElement
+      ? categoryElement.textContent.trim().replace(/\u00A0/g, " ")
+      : "Categoría no encontrada";
   });
   const results = await Promise.all(
     containers.map(async (container) => {
@@ -98,7 +101,8 @@ async function scrapingMakro(page, browser) {
             .replace(/\u00A0/g, " ")
         : "Precio no encontrado";
       //image
-      const resImage =$(".image-container image img").attr("src");
+      const resImage = $(".image-container img").attr("src");
+      // console.log(resCategory,"!!!!!!!!!!!",resTitle,"!!!!!!!!!!!",resDescription,"!!!!!!!!!!!",resPrice)
       return {
         title: resTitle,
         description: resDescription,
@@ -110,14 +114,7 @@ async function scrapingMakro(page, browser) {
       };
     })
   );
-  const filteredResults = results.filter(
-    (product) =>
-      product.title &&
-      product.description &&
-      product.price &&
-      product.image &&
-      !product.image.includes("undefined")
-  );
+  const filteredResults=results.filter(product => product.description !== "Elemento no encontrado");
   return filteredResults;
 }
 async function insertproductsMakro(products, connection) {
@@ -163,9 +160,14 @@ async function insertproductsMakro(products, connection) {
 }
 //! MAIN DE SCRAPING
 (async () => {
-  // const page = await browser.newPage();
-  // const connection = await configBBDD.getConnection();
-  const URLs = ["https://tienda.makro.es/shop/category/frescos/carne"];
+  const connection = await configBBDD.getConnection();
+  // !POR EL AMOR DE DIOS, NO HACE TODOS DE GOLPE COMO ARRAY, PAGINA POR PAGINA 
+  const URLs = [
+    // "https://tienda.makro.es/shop/category/frescos/carne",
+    // "https://tienda.makro.es/shop/category/frescos/frutas",
+    // "https://tienda.makro.es/shop/category/frescos/verduras",
+    "https://tienda.makro.es/shop/category/frescos/pescados-y-mariscos",
+  ];
   const productsMakroArray = [];
   for (let i = 0; i < URLs.length; i++) {
     const page = await browser.newPage();
@@ -175,8 +177,7 @@ async function insertproductsMakro(products, connection) {
     await page.close();
   }
   // Hasta aqui el scrapping de Dia, toca meterlo en la bbdd
-  // await insertproductsMakro(productsMakroArray, connection);
-  console.log(productsMakroArray)
+  await insertproductsMakro(productsMakroArray, connection);
   await browser.close();
   console.log("CULMINO");
 })();
