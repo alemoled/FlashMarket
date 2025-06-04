@@ -7,9 +7,9 @@ session_start();
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mi Cesta de la Compra</title>
+  <title>Lista de la Compra</title>
   <link rel="stylesheet" href="../css/main.css" />
-  <link rel="stylesheet" href="../css/cesta.css" />
+  <link rel="stylesheet" href="../css/lista.css" />
 </head>
 <body>
   <div class="container">
@@ -18,13 +18,15 @@ session_start();
           <a href="../main.php" class="logo">
             <img src="../logos/logo.png" alt="Flash Market Logo" class="logo" />
           </a>
-
+  <!-- entrada de texto -->
           <input type="text" placeholder="Búsqueda..." class="search-bar" />
           <button class="search-btn">
+            
             <img src="../logos/lupa.png" alt="" width="10" height="10">
           </button>
 
           <div class="icon-row">
+
             <button class="icon-btn" onclick="obtenerUbicacion()">
               <img src="../logos/ubicacion.png" alt="Ubicación" />
               <p id="resultado"></p>
@@ -89,10 +91,20 @@ session_start();
       </div>
     </nav>
     </header>
-        <h1>Tu Cesta</h1>
-        <div id="cart-container"></div>
-        <div class="total" id="cart-total"></div>
-        <footer class="footer">
+
+    <main>
+      <section class="shopping-list-controls">
+        <h1>Lista de la Compra</h1>
+        <input type="text" id="list-title" placeholder="Nombre de la lista (ej: Semana 23, Barbacoa)" />
+        <button id="create-list-btn">Crear Lista</button>
+      </section>
+
+      <section id="lists-container">
+        <!-- Las listas creadas se mostrarán aquí -->
+      </section>
+    </main>
+
+    <footer class="footer">
         <div class="footer-container">
           <div class="footer-section">
             <h3>Flash Market</h3>
@@ -117,16 +129,15 @@ session_start();
           <p>&copy; 2025 Flash Market. Todos los derechos reservados.</p>
         </div>
       </footer>
-    </div>
-    <div id="search-modal" class="modal hidden">
+</div>
+<div id="search-modal" class="modal hidden">
   <div class="modal-content">
     <span class="close-btn">&times;</span>
+<!--ESTO ES EL MODAL EL RESULTADO -->
     <h2>Resultado de búsqueda</h2>
     <div id="search-result-text">Buscando...</div>
   </div>
-
-  <script>
-    // Geolocalización
+<script>
     function obtenerUbicacion() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
@@ -134,7 +145,7 @@ session_start();
           const lon = position.coords.longitude;
 
           // Enviar coordenadas al servidor PHP
-          fetch(`scripts/get_postal_code.php?lat=${lat}&lon=${lon}`)
+          fetch(`../scripts/get_postal_code.php?lat=${lat}&lon=${lon}`)
             .then(response => response.text())
             .then(data => {
               localStorage.setItem("codigoPostal", data); // Guardar
@@ -151,52 +162,6 @@ session_start();
       }
     }
 
-    //cesta
-const container = document.getElementById('cart-container');
-    const totalContainer = document.getElementById('cart-total');
-
-    function renderCart() {
-      const cart = JSON.parse(localStorage.getItem('cart')) || [];
-      container.innerHTML = '';
-      let total = 0;
-
-      if (cart.length === 0) {
-        container.innerHTML = '<p class="empty-message">Tu cesta está vacía.</p>';
-        totalContainer.textContent = '';
-        return;
-      }
-
-      cart.forEach(product => {
-        total += product.price * product.quantity;
-
-        const item = document.createElement('div');
-        item.className = 'cart-item';
-        item.innerHTML = `
-          <img src="${product.img}" alt="${product.name}">
-          <div class="cart-item-details">
-            <strong>${product.name}</strong><br>
-            Precio: €${product.price.toFixed(2)}<br>
-            Cantidad: ${product.quantity}
-          </div>
-          <button class="remove-btn" data-id="${product.id}">Eliminar</button>
-        `;
-        container.appendChild(item);
-      });
-
-      totalContainer.textContent = `Total: €${total.toFixed(2)}`;
-
-      document.querySelectorAll('.remove-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const id = e.target.dataset.id;
-          const updatedCart = cart.filter(item => item.id !== id);
-          localStorage.setItem('cart', JSON.stringify(updatedCart));
-          renderCart();
-        });
-      });
-    }
-
-    renderCart();
-
     //Búsqueda  
     const searchBar = document.querySelector('.search-bar');
     const searchBtn = document.querySelector('.search-btn');
@@ -206,8 +171,9 @@ const container = document.getElementById('cart-container');
 
     function mostrarResultados(query) {
       if (!query.trim()) return;
-
-      fetch('scripts/buscar_productos.php', {
+      //TODO HACER MI MIERDA
+      //esto tiene k ir a la API :)
+      fetch('../scripts/buscar_productos.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({ search: query })
@@ -241,8 +207,9 @@ const container = document.getElementById('cart-container');
       modal.classList.add('hidden');
     });
   </script>
-  <script src="../scripts/script.js"></script>
-  <?php
+<script src="../scripts/script.js"></script>
+
+    <?php
     if (isset($_POST['logout'])) {
         session_destroy();
         header("Location: login.php");

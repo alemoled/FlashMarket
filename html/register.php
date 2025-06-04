@@ -3,7 +3,7 @@ session_start();
 
 // Si ya estás logueado, ¿para qué perder tiempo? Te mandamos directo a main.php 😎
 if (isset($_SESSION['username'])) {
-    header('Location: main.php');
+    header('Location: ../main.php');
     exit;
 }
 
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Si todo sale bien, nos guardamos tu username y te llevamos a main.php, ¡es hora de disfrutar!
     if ($response['status'] === 'success') {
         $_SESSION['username'] = $username;  // Guardamos tu username, porque eres nuestro VIP
-        header('Location: main.php');  // Te llevamos directo a la acción
+        header('Location: ../main.php');  // Te llevamos directo a la acción
         exit;
     } else {
         // Si algo sale mal, te mostramos el error para que no te hagas el loco
@@ -43,35 +43,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="form_styles.css">
     <title>Signup</title>
-    <link rel="stylesheet" href="../css/relog.css"> <!-- Tu estilo, porque la vida es corta para no verse bien -->
+    <link rel="stylesheet" href="../css/reloj.css"> <!-- Tu estilo, porque la vida es corta para no verse bien -->
 
 </head>
 <body>
     
     <div class="form-container">
-        <h2>Signup</h2>
+        <h2>Registrarse</h2>
         <?php if ($error): ?>
             <p style="color:red;"><?php echo htmlspecialchars($error); ?></p>  <!-- Si hay un error, te lo decimos con todo el amor posible -->
         <?php endif; ?>
 
-        <form action="signup.php" method="POST">
+        <form action="" method="POST">
             <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="nombre_usuario" name="nombre_usuario" required>
+                <label for="username">Nombre de usuario</label>
+                <input type="text" id="username" name="username" required>
             </div>
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" required>
             </div>
             <div class="form-group">
-                <label for="password">Password </label>
+                <label for="password">Contraseña </label>
                 <input type="password" id="password" name="password" required>
             </div>
             <div class="form-group">
-                <label for="confirm_password">Confirm Password </label>
+                <label for="confirm_password">Confirmar contraseña </label>
                 <input type="password" id="confirm_password" name="confirm_password" required>
             </div>
-            <button type="submit"  class="submit-button">Sign Up</button>  <!-- El botón mágico que te llevará a otro nivel 🚀 -->
+            <button type="submit"  class="submit-button">Registrarse</button>  <!-- El botón mágico que te llevará a otro nivel 🚀 -->
             <div class="form-navigation">
                 <a href="login.php">¿Ya tienes una cuenta? Iniciar Sesión</a>
             </div>
