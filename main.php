@@ -1,5 +1,12 @@
 <?php
 require 'html/API.php';
+$pdo = dbConnect();
+$stmt = $pdo->query("SELECT id, title, description, price, image, category, store
+                     FROM products
+                     WHERE category IN ('Carne', 'Verduras', 'Frutas', 'Pescados y mariscos')
+                     ORDER BY RAND()
+                     LIMIT 12");
+$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -33,7 +40,7 @@ require 'html/API.php';
               <span id="currency-label">EUR</span>
             </button>
 
-            <button class="icon-btn" onclick="window.location.href='pags/lista.php'">
+            <button class="icon-btn" onclick="window.location.href='html/lista.php'">
               <img src="logos/lista.png" alt="Favoritos" />
               <span>Lista y Favoritos</span>
             </button>
@@ -43,18 +50,18 @@ require 'html/API.php';
               <span id="userGreeting">Bienvenido</span>
               <div class="dropdown-user hidden" id="userDropdown">
                 <!-- Por defecto (sesión cerrada) -->
-                <a href="pags/login.php" id="loginBtn">Iniciar sesión</a>
-                <a href="pags/register.php" id="registerBtn">Registrarse</a>
+                <a href="html/login.php" id="loginBtn">Iniciar sesión</a>
+                <a href="html/register.php" id="registerBtn">Registrarse</a>
 
                 <!-- Cuando inicia sesión -->
-                <a href="pags/perfil.php" class="auth-only hidden">Mi perfil</a>
-                <a href="pags/admin.php" class="auth-only hidden">Admin</a>
-                <a href="pags/envios.php" class="auth-only hidden">Envíos</a>
-                <a href="pags/logout.php" id="logoutBtn" class="auth-only hidden">Cerrar sesión</a>
+                <a href="html/perfil.php" class="auth-only hidden">Mi perfil</a>
+                <a href="html/admin.php" class="auth-only hidden">Admin</a>
+                <a href="html/envios.php" class="auth-only hidden">Envíos</a>
+                <a href="html/logout.php" id="logoutBtn" class="auth-only hidden">Cerrar sesión</a>
               </div>
             </div>
 
-            <a href="pags/cesta.php" class="icon-btn">
+            <a href="html/cesta.php" class="icon-btn">
               <img src="logos/carrito.png" alt="Carrito" />
             </a>
           </div>
@@ -103,15 +110,40 @@ require 'html/API.php';
 
         <section class="product-list">
           <div class="product-list">
-            <div class="product" data-id="1" data-name="Producto 1" data-price="10" data-img="https://placehold.co/150" onclick="verProducto(this)">
+          <!-- lo nuevo -->
+
+          <?php foreach ($products as $product): ?>
+      <form method="post" action="html/producto.php" style="display:inline;">
+        <?php foreach ($product as $key => $value): ?>
+          <input type="hidden" name="<?= htmlspecialchars($key) ?>" value="<?= htmlspecialchars($value) ?>">
+        <?php endforeach; ?>
+
+        <button type="submit" style="all: unset; cursor: pointer;">
+          <div class="product" data-id="<?= $product['id'] ?>" data-name="<?= htmlspecialchars($product['title']) ?>" data-price="<?= htmlspecialchars($product['price']) ?>">
+            <div class="product-img">
+              <img src="<?= htmlspecialchars($product['image']) ?>" alt="Producto <?= htmlspecialchars($product['title']) ?>" />
+            </div>
+            <div class="product-info">
+              <span class="product-name"><?= htmlspecialchars($product['title']) ?></span>
+              <span class=""><?= htmlspecialchars($product['price']) ?></span>
+            </div>
+          </div>
+        </button>
+      </form>
+    <?php endforeach; ?>
+
+          <!-- lo viejo -->
+            <a href="html/producto.php">
+            <div class="product" data-id="X" data-name="Producto X" data-price="PRICE">
               <div class="product-img">
-                <img src="https://placehold.co/150" alt="Producto 1" />
+                <img src="URL" alt="Producto X" />
               </div>
               <div class="product-info">
-                <span class="product-name">Producto 1</span>
-                <span class="product-price">€10.00</span>
+                <span class="product-name">TITLE</span>
+                <span class="product-price">PRICE</span>
               </div>
             </div>
+            </a>
 
             <div class="product" data-id="2" data-name="Producto 2" data-price="15" data-img="https://placehold.co/150" onclick="verProducto(this)">
               <div class="product-img">
@@ -308,6 +340,10 @@ require 'html/API.php';
     function mostrarResultados(query) {
       if (!query.trim()) return;
       //OTRA VEZ LO DE LA API DE BUSCADOR
+      //Carne, Frutas, Verduras, Pescados y mariscos
+      //hacer array, random enseñar
+      //Makro, Dia, Carrefour
+      //hacer array, enseñar
       fetch('scripts/buscar_productos.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
