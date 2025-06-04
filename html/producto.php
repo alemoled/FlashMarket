@@ -1,5 +1,77 @@
 <?php
 session_start();
+require 'API.php';
+$pdo = dbConnect();
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Optionally store the product in the session
+    if (isset($_POST['id'], $_POST['title'], $_POST['description'], $_POST['price'], $_POST['image'], $_POST['category'], $_POST['store'])) {
+        $_SESSION['product'] = [
+            'id' => $_POST['id'],
+            'title' => $_POST['title'],
+            'description' => $_POST['description'],
+            'price' => $_POST['price'],
+            'image' => $_POST['image'],
+            'category' => $_POST['category'],
+            'store' => $_POST['store'],
+        ];
+    }
+}
+
+    //deberia hacerlo mandando un hidden con differentes opciones
+    if (isset($_POST['add_to_cart'])) {
+        if (!isset($_SESSION['cart'])) {
+            $_SESSION['cart'] = [];
+        }
+
+        // Get the product ID from the session
+        $productId = $_SESSION['product']['id'] ?? null;
+
+        if ($productId) {
+            if (isset($_SESSION['cart'][$productId])) {
+                $_SESSION['cart'][$productId]++; // increment count
+            } else {
+                $_SESSION['cart'][$productId] = 1; // first time
+            }
+        }
+    }
+
+
+        $category = $_SESSION['product']['category'];
+        $store = $_SESSION['product']['store'];
+
+    // Get the other two stores manually
+    if ($store === 'Makro') {
+        $store1 = 'Dia';
+        $store2 = 'Carrefour';
+    } elseif ($store === 'Dia') {
+        $store1 = 'Makro';
+        $store2 = 'Carrefour';
+    } else {
+        $store1 = 'Makro';
+        $store2 = 'Dia';
+    }
+
+    $stmt1 = $pdo->prepare("
+        SELECT id, title, description,  price, image, store 
+        FROM products
+        WHERE category = ? AND store = ?
+        ORDER BY RAND()
+        LIMIT 1
+    ");
+    $stmt1->execute([$category, $store1]);
+    $product1 = $stmt1->fetch(PDO::FETCH_ASSOC);
+
+    $stmt2 = $pdo->prepare("
+        SELECT id, title, description, price, image, store 
+        FROM products
+        WHERE category = ? AND store = ?
+        ORDER BY RAND()
+        LIMIT 1
+    ");
+    $stmt2->execute([$category, $store2]);
+    $product2 = $stmt2->fetch(PDO::FETCH_ASSOC);
+
+    
 ?>
 
 <!DOCTYPE html>
@@ -45,14 +117,14 @@ session_start();
               <span id="userGreeting">Bienvenido</span>
               <div class="dropdown-user hidden" id="userDropdown">
                 <!-- Por defecto (sesión cerrada) -->
-                <a href="pags/login.php" id="loginBtn">Iniciar sesión</a>
-                <a href="pags/register.php" id="registerBtn">Registrarse</a>
+                <a href="html/login.php" id="loginBtn">Iniciar sesión</a>
+                <a href="html/register.php" id="registerBtn">Registrarse</a>
 
                 <!-- Cuando inicia sesión -->
-                <a href="pags/perfil.php" class="auth-only hidden">Mi perfil</a>
-                <a href="pags/admin.php" class="auth-only hidden">Admin</a>
-                <a href="pags/envios.php" class="auth-only hidden">Envíos</a>
-                <a href="pags/logout.php" id="logoutBtn" class="auth-only hidden">Cerrar sesión</a>
+                <a href="html/perfil.php" class="auth-only hidden">Mi perfil</a>
+                <a href="html/admin.php" class="auth-only hidden">Admin</a>
+                <a href="html/envios.php" class="auth-only hidden">Envíos</a>
+                <a href="html/logout.php" id="logoutBtn" class="auth-only hidden">Cerrar sesión</a>
               </div>
             </div>
 
@@ -93,57 +165,62 @@ session_start();
 
   <main class="product-page">
     <div class="product-content">
-      <!-- Foto y detalles principales -->
-      <div class="product-photo">
-        <img src="https://placehold.co/400x400?text=Foto+del+Producto" alt="Foto del Producto" />
-      </div>
+    <!-- Foto y detalles principales -->
+    <div class="product-photo">
+    <img src="<?= htmlspecialchars($_SESSION['product']['image'] ?? '') ?>" alt="Foto del Producto" />
+</div>
 
-      <div class="product-details">
-        <h1>Nombre del Producto</h1>
-        <p>Descripción</p>
-      </div>
+<div class="product-details">
+    <h1><?= htmlspecialchars($_SESSION['product']['title'] ?? '') ?></h1>
+    <p><?= htmlspecialchars($_SESSION['product']['description'] ?? '') ?></p>
+</div>
 
-      <!-- Precio principal y botón -->
-      <aside class="product-price-box">
+
+    <!-- Precio principal y botón -->
+    <aside class="product-price-box">
         <p class="price-label">Precio</p>
-        <p class="product-price-main"><span class="product-price">XX,XX€</span></p>
-        <button class="add-to-cart">Añadir al Carrito</button>
-      </aside>
-    </div>
+        <p class="product-price-main">
+            <span class="product-price"><?= htmlspecialchars($_SESSION['product']['price'] ?? '') ?></span>
+
+        </p>
+        <form method="post" action="producto.php">
+          <input type="hidden" name="add_to_cart" value="1">
+          <button type="submit" class="add-to-cart">Añadir al Carrito</button>
+        </form>
+    </aside>
+</div>
 
     <!-- Tiendas que ofrecen este producto -->
     <div class="store-list-visual">
       <!-- Ejemplo 1 -->
-      <div class="store-row product" data-price="4.99">
-        <img src="https://placehold.co/50x50?text=Foto" alt="Foto" />
-        <div class="store-info">
-          <div class="product-name">Producto Nombre</div>
-          <div class="store-name">Tienda X</div>
-        </div>
-        <div class="store-price product-price">Precio XX,XX€</div>
-      </div>
+<!-- Print one product from each other store -->
+<?php foreach ([$product1, $product2] as $product): ?>
+    <?php if (!empty($product)): ?>
+        <form method="post" action="producto.php" style="display: inline;">
+  <!-- Hidden inputs to send product data -->
+  <input type="hidden" name="id" value="<?= htmlspecialchars($product['id']) ?>">
+  <input type="hidden" name="title" value="<?= htmlspecialchars($product['title']) ?>">
+  <input type="hidden" name="description" value="<?= htmlspecialchars($product['description'] ?? '') ?>">
+  <input type="hidden" name="price" value="<?= htmlspecialchars($product['price']) ?>">
+  <input type="hidden" name="image" value="<?= htmlspecialchars($product['image']) ?>">
+  <input type="hidden" name="category" value="<?= htmlspecialchars($product['category'] ?? $_SESSION['product']['category']) ?>">
+  <input type="hidden" name="store" value="<?= htmlspecialchars($product['store']) ?>">
 
-      <!-- Ejemplo 2 -->
-      <div class="store-row product" data-price="5.49">
-        <img src="https://placehold.co/50x50?text=Foto" alt="Foto" />
-        <div class="store-info">
-          <div class="product-name">Producto Nombre</div>
-          <div class="store-name">Tienda Y</div>
-        </div>
-        <div class="store-price product-price">Precio XX,XX€</div>
+  <!-- Styled like a div, behaves like a button -->
+  <button type="submit" style="all: unset; width: 100%; cursor: pointer;">
+    <div class="store-row product" data-price="<?= htmlspecialchars($product['price']) ?>">
+      <img src="<?= htmlspecialchars($product['image']) ?>" alt="Foto" />
+      <div class="store-info">
+        <div class="product-name"><?= htmlspecialchars($product['title']) ?></div>
+        <div class="store-name"><?= htmlspecialchars($product['store']) ?></div>
       </div>
-
-      <!-- Ejemplo 3 -->
-      <div class="store-row product" data-price="6.10">
-        <img src="https://placehold.co/50x50?text=Foto" alt="Foto" />
-        <div class="store-info">
-          <div class="product-name">Producto Nombre</div>
-          <div class="store-name">Tienda Z</div>
-        </div>
-        <div class="store-price product-price">Precio XX,XX€</div>
-      </div>
+      <div class="store-price"><?= htmlspecialchars($product['price']) ?></div>
     </div>
+  </button>
+</form>
 
+    <?php endif; ?>
+<?php endforeach; ?>
 
   </main>
 

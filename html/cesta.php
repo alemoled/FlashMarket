@@ -4,8 +4,8 @@ if (!isset($_SESSION['username'])) {
     header('Location: ../main.php');
     exit;
 }
-
 require 'api.php';
+$pdo = dbConnect();
 ?>
 
 <!DOCTYPE html>
@@ -51,14 +51,14 @@ require 'api.php';
               <span id="userGreeting">Bienvenido</span>
               <div class="dropdown-user hidden" id="userDropdown">
                 <!-- Por defecto (sesión cerrada) -->
-                <a href="pags/login.php" id="loginBtn">Iniciar sesión</a>
-                <a href="pags/register.php" id="registerBtn">Registrarse</a>
+                <a href="html/login.php" id="loginBtn">Iniciar sesión</a>
+                <a href="html/register.php" id="registerBtn">Registrarse</a>
 
                 <!-- Cuando inicia sesión -->
-                <a href="pags/perfil.php" class="auth-only hidden">Mi perfil</a>
-                <a href="pags/admin.php" class="auth-only hidden">Admin</a>
-                <a href="pags/envios.php" class="auth-only hidden">Envíos</a>
-                <a href="pags/logout.php" id="logoutBtn" class="auth-only hidden">Cerrar sesión</a>
+                <a href="html/perfil.php" class="auth-only hidden">Mi perfil</a>
+                <a href="html/admin.php" class="auth-only hidden">Admin</a>
+                <a href="html/envios.php" class="auth-only hidden">Envíos</a>
+                <a href="html/logout.php" id="logoutBtn" class="auth-only hidden">Cerrar sesión</a>
               </div>
             </div>
 
