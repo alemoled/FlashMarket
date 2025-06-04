@@ -232,7 +232,7 @@ main {
   position: relative;
   width: 100%;
   max-width: 100%;
-  height: 350px;
+  height: 500px;
   overflow: hidden;
   border-radius: 10px;
   border: 1px solid #7ba3a2;
@@ -242,7 +242,7 @@ main {
 .carousel-slide {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: inherit;
   display: none;
   position: absolute;
   top: 0;

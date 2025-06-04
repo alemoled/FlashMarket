@@ -1,6 +1,6 @@
 <?php
 session_start();
-require '../php/conexion.php';
+require 'Conexion.php';
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['search'])) {

@@ -1,5 +1,5 @@
 <?php
-session_start();
+require 'html/API.php';
 ?>
 
 <!DOCTYPE html>
@@ -91,9 +91,9 @@ session_start();
       <main>
         <section class="carousel">
           <div class="carousel-container">
-            <img src="images/slide1.jpg" alt="Oferta 1" class="carousel-slide active" />
-            <img src="images/slide2.jpg" alt="Oferta 2" class="carousel-slide" />
-            <img src="images/slide3.jpg" alt="Oferta 3" class="carousel-slide" />
+            <img src="img/bannerDia.png" alt="Oferta 1" class="carousel-slide active" />
+            <img src="img/bannerCarrefour.png" alt="Oferta 2" class="carousel-slide" />
+            <img src="img/bannerMakro.png" alt="Oferta 3" class="carousel-slide" />
         
             <button class="carousel-btn prev">&#10094;</button>
             <button class="carousel-btn next">&#10095;</button>
@@ -217,9 +217,9 @@ session_start();
             <h4>Enlaces útiles</h4>
             <ul>
               <li><a href="main.php">Inicio</a></li>
-              <li><a href="pags/lista.php">Lista de Favoritos</a></li>
-              <li><a href="pags/terminos.php">Términos y Condiciones</a></li>
-              <li><a href="pags/politica.php">Política de Privacidad</a></li>
+              <li><a href="html/lista.php">Lista de Favoritos</a></li>
+              <li><a href="html/terminos.php">Términos y Condiciones</a></li>
+              <li><a href="html/politica.php">Política de Privacidad</a></li>
             </ul>
           </div>
           <div class="footer-section">
@@ -307,7 +307,7 @@ session_start();
 
     function mostrarResultados(query) {
       if (!query.trim()) return;
-
+      //OTRA VEZ LO DE LA API DE BUSCADOR
       fetch('scripts/buscar_productos.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -347,7 +347,7 @@ session_start();
     const name = encodeURIComponent(element.dataset.name);
     const price = encodeURIComponent(element.dataset.price);
     const img = encodeURIComponent(element.dataset.img);
-    window.location.href = `pags/producto.php?name=${name}&price=${price}&img=${img}`;
+    window.location.href = `html/producto.php?name=${name}&price=${price}&img=${img}`;
   }
   </script>
 </div>

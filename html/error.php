@@ -65,7 +65,7 @@
     <div class="containerError">
         <h1 class="titleError">¡Ups! Algo salió mal</h1>
         <p class="messageError"><?php echo htmlspecialchars($errorMessage); ?></p>
-        <a href="../html/main.php" class="buttonBack">Volver al inicio</a>
+        <a href="../main.php" class="buttonBack">Volver al inicio</a>
     </div>
 </body>
 </html>
