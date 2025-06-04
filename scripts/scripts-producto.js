@@ -1,36 +1,3 @@
-//carrusel
-let currentSlide = 0;
-const slides = document.querySelectorAll('.carousel-slide');
-const totalSlides = slides.length;
-
-const nextBtn = document.querySelector('.carousel-btn.next');
-const prevBtn = document.querySelector('.carousel-btn.prev');
-
-function showSlide(index) {
-  slides.forEach((slide, i) => {
-    slide.classList.remove('active');
-    if (i === index) slide.classList.add('active');
-  });
-}
-
-function nextSlide() {
-  currentSlide = (currentSlide + 1) % totalSlides;
-  showSlide(currentSlide);
-}
-
-function prevSlide() {
-  currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-  showSlide(currentSlide);
-}
-
-nextBtn.addEventListener('click', nextSlide);
-prevBtn.addEventListener('click', prevSlide);
-
-// Auto play
-setInterval(nextSlide, 5000); // cambia cada 5 segundos
-
-//----------------------------------------
-
 //divisas
 const currencyBtn = document.getElementById('currency-btn');
 const currencyLabel = document.getElementById('currency-label');
