@@ -174,10 +174,14 @@ $pdo = dbConnect();
       }
 
       console.log("COSITAS EN EL CARRO");
-
+      
       cart.forEach(product => {
-        console.log(product);
-        total += parseFloat(product.price) * product.quantity;
+        // console.log(product.price);
+        // console.log(parseFloat(product.price));
+        // console.log(product);
+        const numericPrice = parseFloat(product.price.replace('€', '').replace(/\s/g, '').replace(',', '.'));
+        // console.log(numericPrice);
+        total += numericPrice * product.quantity;
 
         const item = document.createElement('div');
         item.className = 'cart-item';
@@ -185,7 +189,7 @@ $pdo = dbConnect();
           <img src="${product.img}" alt="${product.name}">
           <div class="cart-item-details">
             <strong>${product.name}</strong><br>
-            Precio: €${parseFloat(product.price).toFixed(2)}<br>
+            Precio: ${product.price}<br>
             Cantidad: ${product.quantity}
           </div>
           <button class="remove-btn" data-id="${product.id}">Eliminar</button>
