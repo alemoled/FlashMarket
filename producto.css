@@ -1,0 +1,169 @@
+/* ========== PAGINA PRODUCTO ========== */
+.product-page {
+  padding: 20px;
+}
+
+.product-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap; /* para que se ajusten en pantallas pequeñas */
+}
+
+.product-photo img {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  border: 1px solid #90b2a3;
+  border-radius: 5px;
+  background-color: #ddd;
+}
+
+.product-details {
+  flex: 1;
+  margin-left: 20px;
+  min-width: 250px;
+  margin-top: 20px;
+}
+
+.product-price-box {
+  background-color: #eaeaea;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
+  min-width: 200px;
+  margin-top: 20px;
+}
+
+.product-price-main {
+  color: #3e885b;
+  font-size: 24px;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.add-to-cart {
+  background-color: #7fae9e;
+  color: white;
+  border: none;
+  padding: 10px;
+  width: 100%;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.store-list-visual {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.store-row {
+  display: flex;
+  flex-direction: column;
+  align-items:flex-start;
+  text-align: left;
+  justify-content: space-between;
+  background-color: #7fae9e;
+  padding: 10px 20px;
+  border-radius: 8px;
+  color: white;
+  flex-wrap: wrap;
+}
+
+.store-row img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  background-color: #d9d9d9;
+  border-radius: 4px;
+  margin-right: 20px;
+  margin-bottom: 10px;
+}
+
+.store-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.product-name {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.store-name {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.store-price {
+  font-size: 16px;
+  font-weight: 600;
+  align-self: flex-end;
+  white-space: nowrap;
+  color: white;
+}
+
+
+/* ========== MEDIA QUERIES ========== */
+
+/* Tablets */
+@media (max-width: 991px) {
+  .product-content {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .product-details {
+    margin-left: 0;
+    text-align: center;
+  }
+
+  .product-price-box {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .store-row {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .store-row img {
+    margin-bottom: 10px;
+  }
+
+  .store-price {
+    align-self: flex-end;
+  }
+}
+
+/* Móviles */
+@media (max-width: 600px) {
+  .product-details h1 {
+    font-size: 20px;
+  }
+
+  .product-price-main {
+    font-size: 20px;
+  }
+
+  .add-to-cart {
+    font-size: 16px;
+  }
+
+  .store-name,
+  .product-name {
+    font-size: 14px;
+  }
+
+  .store-price {
+    font-size: 14px;
+  }
+}
