@@ -173,7 +173,7 @@ session_start();
       if (!query.trim()) return;
       //TODO HACER MI MIERDA
       //esto tiene k ir a la API :)
-      fetch('../scripts/buscar_productos.php', {
+      fetch('buscador.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({ search: query })

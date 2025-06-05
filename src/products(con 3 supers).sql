@@ -27,6 +27,8 @@ SET time_zone = "+00:00";
 -- Table structure for table `products`
 --
 
+DROP TABLE `products`;
+
 CREATE TABLE `products` (
   `id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
