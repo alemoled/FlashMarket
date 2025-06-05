@@ -158,7 +158,7 @@ $pdo = dbConnect();
     }
 
     //cesta
-const container = document.getElementById('cart-container');
+    const container = document.getElementById('cart-container');
     const totalContainer = document.getElementById('cart-total');
 
     function renderCart() {
@@ -169,11 +169,15 @@ const container = document.getElementById('cart-container');
       if (cart.length === 0) {
         container.innerHTML = '<p class="empty-message">Tu cesta está vacía.</p>';
         totalContainer.textContent = '';
+        console.log("no hay nada en el carro");
         return;
       }
 
+      console.log("COSITAS EN EL CARRO");
+
       cart.forEach(product => {
-        total += product.price * product.quantity;
+        console.log(product);
+        total += parseFloat(product.price) * product.quantity;
 
         const item = document.createElement('div');
         item.className = 'cart-item';
@@ -181,7 +185,7 @@ const container = document.getElementById('cart-container');
           <img src="${product.img}" alt="${product.name}">
           <div class="cart-item-details">
             <strong>${product.name}</strong><br>
-            Precio: €${product.price.toFixed(2)}<br>
+            Precio: €${parseFloat(product.price).toFixed(2)}<br>
             Cantidad: ${product.quantity}
           </div>
           <button class="remove-btn" data-id="${product.id}">Eliminar</button>
@@ -201,7 +205,9 @@ const container = document.getElementById('cart-container');
       });
     }
 
-    renderCart();
+    document.addEventListener('DOMContentLoaded', () => {
+  renderCart();
+});
 
     //Búsqueda  
     const searchBar = document.querySelector('.search-bar');
@@ -213,7 +219,7 @@ const container = document.getElementById('cart-container');
     function mostrarResultados(query) {
       if (!query.trim()) return;
 
-      fetch('../scripts/buscar_productos.php', {
+      fetch('buscador.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({ search: query })

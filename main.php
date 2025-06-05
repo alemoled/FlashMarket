@@ -24,6 +24,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <a href="main.php" class="logo">
             <img src="logos/logo.png" alt="Flash Market Logo" class="logo" />
           </a>
+          <!-- ESTO ES LA BARRA DE BUSQUEDA -->
           <input type="text" placeholder="Búsqueda..." class="search-bar" />
           <button class="search-btn">
             <img src="logos/lupa.png" alt="" width="10" height="10">
@@ -132,109 +133,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
       </form>
     <?php endforeach; ?>
 
-          <!-- lo viejo -->
-            <a href="html/producto.php">
-            <div class="product" data-id="X" data-name="Producto X" data-price="PRICE">
-              <div class="product-img">
-                <img src="URL" alt="Producto X" />
-              </div>
-              <div class="product-info">
-                <span class="product-name">TITLE</span>
-                <span class="product-price">PRICE</span>
-              </div>
-            </div>
-            </a>
-
-            <div class="product" data-id="2" data-name="Producto 2" data-price="15" data-img="https://placehold.co/150" onclick="verProducto(this)">
-              <div class="product-img">
-                <img src="https://placehold.co/150" alt="Producto 2" />
-              </div>
-              <div class="product-info">
-                <span class="product-name">Producto 2</span>
-                <span class="product-price">€15.00</span>
-              </div>
-            </div>
-
-            <div class="product" data-id="3" data-name="Producto 3" data-price="30" data-img="https://placehold.co/150" onclick="verProducto(this)">
-              <div class="product-img">
-                <img src="https://placehold.co/150" alt="Producto 3" />
-              </div>
-              <div class="product-info">
-                <span class="product-name">Producto 3</span>
-                <span class="product-price">€30.00</span>
-              </div>
-            </div>
-
-            <div class="product" data-id="4" data-name="Producto 4" data-price="8" data-img="https://placehold.co/150" onclick="verProducto(this)">
-              <div class="product-img">
-                <img src="https://placehold.co/150" alt="Producto 4" />
-              </div>
-              <div class="product-info">
-                <span class="product-name">Producto 4</span>
-                <span class="product-price">€8.00</span>
-              </div>
-            </div>
-
-            <div class="product" data-id="5" data-name="Producto 5" data-price="22" data-img="https://placehold.co/150" onclick="verProducto(this)">
-              <div class="product-img">
-                <img src="https://placehold.co/150" alt="Producto 5" />
-              </div>
-              <div class="product-info">
-                <span class="product-name">Producto 5</span>
-                <span class="product-price">€22.00</span>
-              </div>
-            </div>
-
-            <div class="product" data-id="6" data-name="Producto 6" data-price="2.50" data-img="https://placehold.co/150" onclick="verProducto(this)">
-              <div class="product-img">
-                <img src="https://placehold.co/150" alt="Producto 6" />
-              </div>
-              <div class="product-info">
-                <span class="product-name">Producto 6</span>
-                <span class="product-price">€2.50</span>
-              </div>
-            </div>
-
-            <div class="product" data-id="7" data-name="Producto 7" data-price="5.40" data-img="https://placehold.co/150" onclick="verProducto(this)">
-              <div class="product-img">
-                <img src="https://placehold.co/150" alt="Producto 7" />
-              </div>
-              <div class="product-info">
-                <span class="product-name">Producto 7</span>
-                <span class="product-price">€5.40</span>
-              </div>
-            </div>
-
-            <div class="product" data-id="8" data-name="Producto 8" data-price="8" data-img="https://placehold.co/150" onclick="verProducto(this)">
-              <div class="product-img">
-                <img src="https://placehold.co/150" alt="Producto 8" />
-              </div>
-              <div class="product-info">
-                <span class="product-name">Producto 8</span>
-                <span class="product-price">€8.00</span>
-              </div>
-            </div>
-
-            <div class="product" data-id="9" data-name="Producto 9" data-price="7.45" data-img="https://placehold.co/150" onclick="verProducto(this)">
-              <div class="product-img">
-                <img src="https://placehold.co/150" alt="Producto 9" />
-              </div>
-              <div class="product-info">
-                <span class="product-name">Producto 7</span>
-                <span class="product-price">€7.45</span>
-              </div>
-            </div>
-
-            <div class="product" data-id="10" data-name="Producto 10" data-price="58" data-img="https://placehold.co/150" onclick="verProducto(this)">
-              <div class="product-img">
-                <img src="https://placehold.co/150" alt="Producto 10" />
-              </div>
-              <div class="product-info">
-                <span class="product-name">Producto 8</span>
-                <span class="product-price">€58.00</span>
-              </div>
-            </div>
-
+          
           </div>   
         </section>
       </main>
@@ -339,12 +238,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     function mostrarResultados(query) {
       if (!query.trim()) return;
-      //OTRA VEZ LO DE LA API DE BUSCADOR
-      //Carne, Frutas, Verduras, Pescados y mariscos
-      //hacer array, random enseñar
-      //Makro, Dia, Carrefour
-      //hacer array, enseñar
-      fetch('scripts/buscar_productos.php', {
+      fetch('html/buscador.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({ search: query })

@@ -224,7 +224,7 @@ const container = document.getElementById('cart-container');
     function mostrarResultados(query) {
       if (!query.trim()) return;
 
-      fetch('scripts/buscar_productos.php', {
+      fetch('buscador.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({ search: query })

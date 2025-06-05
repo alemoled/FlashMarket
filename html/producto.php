@@ -17,23 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-    //deberia hacerlo mandando un hidden con differentes opciones
-    if (isset($_POST['add_to_cart'])) {
-        if (!isset($_SESSION['cart'])) {
-            $_SESSION['cart'] = [];
-        }
-
-        // Get the product ID from the session
-        $productId = $_SESSION['product']['id'] ?? null;
-
-        if ($productId) {
-            if (isset($_SESSION['cart'][$productId])) {
-                $_SESSION['cart'][$productId]++; // increment count
-            } else {
-                $_SESSION['cart'][$productId] = 1; // first time
-            }
-        }
-    }
 
 
         $category = $_SESSION['product']['category'];
@@ -181,12 +164,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p class="price-label">Precio</p>
         <p class="product-price-main">
             <span class="product-price"><?= htmlspecialchars($_SESSION['product']['price'] ?? '') ?></span>
-
         </p>
-        <form method="post" action="producto.php">
+
           <input type="hidden" name="add_to_cart" value="1">
+          <div>
+          <div class="product" 
+            data-id="<?= htmlspecialchars($_SESSION['product']['id']) ?>" 
+            data-name="<?= htmlspecialchars($_SESSION['product']['title']) ?>" 
+            data-price="<?= htmlspecialchars($_SESSION['product']['price']) ?>" 
+            data-img="<?= htmlspecialchars($_SESSION['product']['image']) ?>" 
+            style="display: none;">
+          </div>
           <button type="submit" class="add-to-cart">Añadir al Carrito</button>
-        </form>
+          
     </aside>
 </div>
 
@@ -257,32 +247,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div id="search-result-text">Buscando...</div>
       </div>
     <script>
+
     //cesta
-    document.querySelectorAll('.add-to-cart').forEach(button => {
-      button.addEventListener('click', (e) => {
-        const productDiv = e.target.closest('.product');
-        const product = {
-          id: productDiv.dataset.id,
-          name: productDiv.dataset.name,
-          price: parseFloat(productDiv.dataset.price),
-          img: productDiv.dataset.img,
-          quantity: 1
-        };
 
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    document.addEventListener('DOMContentLoaded', function () {
+    const addToCartBtn = document.querySelector('.add-to-cart');
+    const productElement = document.querySelector('.product');
 
-        // Si ya existe, aumentar cantidad
-        const existing = cart.find(p => p.id === product.id);
-        if (existing) {
-          existing.quantity += 1;
-        } else {
-          cart.push(product);
-        }
+    addToCartBtn.addEventListener('click', function () {
+      const productId = productElement.dataset.id;
+      const product = {
+        id: productId,
+        name: productElement.dataset.name,
+        price: productElement.dataset.price,
+        img: productElement.dataset.img,
+        quantity: 1
+      };
 
-        localStorage.setItem('cart', JSON.stringify(cart));
-        alert('Producto agregado a la cesta');
-      });
+      
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+      
+      const existingProduct = cart.find(item => item.id === productId);
+
+      if (existingProduct) {
+        
+        existingProduct.quantity += 1;
+      } else {
+        
+        cart.push(product);
+      }
+
+      
+      localStorage.setItem('cart', JSON.stringify(cart));
+      alert('Producto añadido al carrito');
+      console.log('Cart updated:', cart);
     });
+  });
 
     // Geolocalización
     function obtenerUbicacion() {
@@ -319,7 +320,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     function mostrarResultados(query) {
       if (!query.trim()) return;
 
-      fetch('scripts/buscar_productos.php', {
+      fetch('buscador.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({ search: query })
@@ -366,27 +367,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       document.querySelector('.product-price').textContent = `€${parseFloat(price).toFixed(2)}`;
     }
 
-    // Funcionalidad de "Agregar al carrito"
-    document.querySelector('.add-to-cart').addEventListener('click', () => {
-      const product = {
-        id: name + price,
-        name: name,
-        price: parseFloat(price),
-        img: img,
-        quantity: 1
-      };
 
-      let cart = JSON.parse(localStorage.getItem('cart')) || [];
-      const existing = cart.find(p => p.id === product.id);
-      if (existing) {
-        existing.quantity += 1;
-      } else {
-        cart.push(product);
-      }
-
-      localStorage.setItem('cart', JSON.stringify(cart));
-      alert('Producto agregado a la cesta');
-    });
   </script>
 <script src="../scripts/script.js"></script>
 
