@@ -83,7 +83,7 @@ async function scrapingDia(page, browser) {
       const $ = cheerio.load(container);
       //title
       const resTitle = $(".search-product-card__product-name").text().trim();
-      //TODO: Descripcion aqui falta porque debes entrar en cada puta pagina de producto y obtener su info, duro como el solo.IDEA:HACEMOS NUEVA PAGINA,HIJA DE ESTAS PARA NO PERDER LA INFO
+      //TODO: Descripcion aqui falta porque debes entrar en cada pagina de producto y obtener su info, duro como el solo.IDEA:HACEMOS NUEVA PAGINA,HIJA DE ESTAS PARA NO PERDER LA INFO
       const productURL =
         "https://www.dia.es" +
         $(".search-product-card__product-link").attr("href");

@@ -3,6 +3,7 @@ import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import * as cheerio from "cheerio";
 import mysql from "mysql2/promise";
+var cont = 1;
 // *CONSTANTES GLOBALES
 //Iniciamos el navegador bot y configuramos para que el bot no sea automaticamente bloqueado y podamos trabajar sin abrir un navegador
 puppeteer.use(StealthPlugin());
@@ -34,28 +35,28 @@ async function autoScroll(page) {
   });
 }
 // *Funcion para que en DIA se meta en la pag de producto y tome su descripcion,si no toma el cacho de texto en sus migas de pan
-async function getDescription(productURL, browser) {
-  const productPage = await browser.newPage();
-  await productPage.setUserAgent(
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/122.0.0.0 Safari/537.36"
-  );
+async function getDescription(productURL) {
   try {
+    const productPage = await browser.newPage();
+    await productPage.setUserAgent(
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/122.0.0.0 Safari/537.36"
+    );
     await productPage.goto(productURL, {
-      waitUntil: "networkidle2",
+      waitUntil: "domcontentloaded",
       timeout: 60000,
     });
-    await autoScroll(productPage);
+    await new Promise((resolve) => setTimeout(resolve, 3000)); // Espera 3 segundos
+    // await productPage.screenshot({
+    //   path: "screenshots/screenshot" + cont + ".png",
+    // });
     const description = await productPage.evaluate(() => {
-      const productContainer = document.querySelector("#details-tabs-pane-1");
-      if (!productContainer) return "Elemento no encontrado";
       return (
-        productContainer
-          .querySelector("p")
-          ?.innerText.replace(/\n/g, " ")
-          .trim() || "Sin descripción"
+        // Recoger datos de descripcion
+        document
+          .querySelector(".nutrition-ingredients__content")
+          ?.textContent.trim()
       );
     });
-    await productPage.close();
     return description;
   } catch (error) {
     console.error(
@@ -63,46 +64,65 @@ async function getDescription(productURL, browser) {
     );
     await productPage.close();
     return "Error al cargar descripción";
+  } finally {
+    cont++;
   }
 }
 //*CASO DIA
-async function scrapingMakro(page, browser) {
+async function scrapingCarrefour(page, productPage) {
   await autoScroll(page);
-  await new Promise((r) => setTimeout(r, 3000));
   const elementsHandle = await page.evaluateHandle(() => {
-    return document.querySelectorAll(".sd-articlecard");
+    // Tomar contenedores con todos los datos para productos
+    return document.querySelectorAll(".product-card-list__item");
   });
   // Convertir el JSHandle en un array de elementos
   const containers = await elementsHandle.evaluate((element) =>
     Array.from(element).map((el) => el.outerHTML)
   );
   //category
-  const resCategory = await page.evaluate(() => {
-    const categoryElement = document.querySelector(
-      ".list-group-item.list-group-item-header.list-group-item-back h1 span"
-    );
-    return categoryElement
-      ? categoryElement.textContent.trim().replace(/\u00A0/g, " ")
-      : "Categoría no encontrada";
+  var resCategory = await page.evaluate(() => {
+    return document
+      .querySelector(".raw-html__category-container h1")
+      .textContent.trim()
+      .replace(/\s+/g, " ");
   });
+  //  Sanear categoria para que coincidan en la BBDD
+  if (resCategory == "Aceites y vinagres") {
+    resCategory = "Aceites, salsas y especias";
+  } else if (resCategory == "\n    Conservas de Carne\n  ") {
+    resCategory = "Carne";
+  } else if (resCategory.trim() == "Queso Rallado") {
+    resCategory = "Charcutería y quesos";
+  }else if (resCategory.trim() == "Frutos del Bosque") {
+    resCategory = "Frutas";
+  }else if (resCategory.trim() == "Listo para beber") {
+    resCategory = "Leche, huevos y mantequilla";
+  }else if (resCategory.trim() == "Lejías lavadora") {
+    resCategory = "Limpieza y hogar";
+  }else if (resCategory.trim() == "Conservas de Pescado y Marisco") {
+    resCategory = "Pescados y mariscos";
+  }else if (resCategory.trim() == "Ensaladas y Verduras Preparadas") {
+    resCategory = "Verduras";
+  }
+
   const results = await Promise.all(
     containers.map(async (container) => {
       const $ = cheerio.load(container);
       //title
-      const resTitle = $(".title-wrapper h4").text().trim();
+      const resTitle = $(".product-card__title-link").text().trim();
       //TODO: Descripcion aqui falta porque debes entrar en cada pagina de producto y obtener su info, duro como el solo.IDEA:HACEMOS NUEVA PAGINA,HIJA DE ESTAS PARA NO PERDER LA INFO
-      const productURL = "https://tienda.makro.es" + $(".title").attr("href");
-      const resDescription = await getDescription(productURL, browser);
+      //   Obtener Url de la pagina que tenga la descripcion del producto itinerado
+      const productURL =
+        "https://www.carrefour.es" +
+        $(".product-card__title-link").attr("href");
+      if (productURL !== "https://www.carrefour.esundefined")
+        var resDescription = await getDescription(productURL, productPage);
+        if(typeof resDescription== "undefined") resDescription=resTitle
       //price
-      const resPrice = $(".price-display-main-row .primary span span")
-        ? $(".price-display-main-row .primary span span")
-            .text()
-            .trim()
-            .replace(/\u00A0/g, " ")
-        : "Precio no encontrado";
+      const resPrice = $(".product-card__price").text().trim();
+      // .replace(/\u00A0/g, " "); OJO:METER ESTO SI TENEMOS QUE SANEAR EL TEXTO
       //image
-      const resImage = $(".image-container img").attr("src");
-      // console.log(resCategory,"!!!!!!!!!!!",resTitle,"!!!!!!!!!!!",resDescription,"!!!!!!!!!!!",resPrice)
+      const resImage = $(".product-card__image").attr("src");
       return {
         title: resTitle,
         description: resDescription,
@@ -110,14 +130,21 @@ async function scrapingMakro(page, browser) {
         image: resImage,
         category: resCategory,
         //store
-        store: "Makro",
+        store: "Carrefour",
       };
     })
   );
-  const filteredResults=results.filter(product => product.description !== "Elemento no encontrado");
+  const filteredResults = results.filter(
+    (product) =>
+      product.title &&
+      product.description &&
+      product.price &&
+      product.image &&
+      !product.image.includes("undefined")
+  );
   return filteredResults;
 }
-async function insertproductsMakro(products, connection) {
+async function insertproductsCarrefour(products, connection) {
   try {
     for (const product of products) {
       const [rows] = await connection.execute(
@@ -160,24 +187,32 @@ async function insertproductsMakro(products, connection) {
 }
 //! MAIN DE SCRAPING
 (async () => {
+  // const page = await browser.newPage();
   const connection = await configBBDD.getConnection();
-  // ! NO HACER TODOS DE GOLPE COMO ARRAY, PAGINA POR PAGINA 
   const URLs = [
-    // "https://tienda.makro.es/shop/category/frescos/carne",
-    // "https://tienda.makro.es/shop/category/frescos/frutas",
-    // "https://tienda.makro.es/shop/category/frescos/verduras",
-    "https://tienda.makro.es/shop/category/frescos/pescados-y-mariscos",
+    "https://www.carrefour.es/supermercado/la-despensa/alimentacion/aceites-y-vinagres/cat20066/c",
+    "https://www.carrefour.es/supermercado/la-despensa/conservas-sopas-y-precocinados/conservas-de-carne/cat20109/c",
+    "https://www.carrefour.es/supermercado/productos-frescos/quesos/rallados/cat690002/c",
+    "https://www.carrefour.es/supermercado/productos-frescos/frutas/frutos-del-bosque/cat220009/c",
+    "https://www.carrefour.es/supermercado/la-despensa/lacteos/listo-para-beber/cat410003/c",
+    "https://www.carrefour.es/supermercado/limpieza-y-hogar/cuidado-de-la-ropa/lejias-lavadora/cat290001/c",
+    "https://www.carrefour.es/supermercado/la-despensa/conservas-sopas-y-precocinados/conservas-de-pescado-y-marisco/cat20111/c",
+    "https://www.carrefour.es/supermercado/productos-frescos/verduras-y-hortalizas/ensaladas-y-verduras-preparadas/cat220020/c",
+
   ];
-  const productsMakroArray = [];
+  const productsCarrefourArray = [];
+  const page = await browser.newPage();
+  const productPage = await browser.newPage();
   for (let i = 0; i < URLs.length; i++) {
-    const page = await browser.newPage();
     await page.goto(URLs[i]);
-    const productsPage = await scrapingMakro(page, browser);
-    productsMakroArray.push(...productsPage);
-    await page.close();
+    const productsPage = await scrapingCarrefour(page, productPage);
+    productsCarrefourArray.push(...productsPage);
   }
   // Hasta aqui el scrapping de Dia, toca meterlo en la bbdd
-  await insertproductsMakro(productsMakroArray, connection);
+  await page.close();
+  await productPage.close();
+  // console.log(productsCarrefourArray);
+  await insertproductsCarrefour(productsCarrefourArray, connection);
   await browser.close();
   console.log("CULMINO");
 })();
